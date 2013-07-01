@@ -1,0 +1,83 @@
+#!/bin/bash
+#
+# Init file for Glu Agent
+#
+# chkconfig: - 80 12
+# description: Start the Glu agent
+#
+# processname: glu
+# config:
+# config:
+
+source /etc/rc.d/init.d/functions
+GLU_VERSION=5.0.0
+GLU_LOG="/var/log/glu-agent/org.linkedin.glu.agent-server.out"
+BASEDIR="/opt/glu/agent-server/$GLU_VERSION/"
+### Default variables
+
+### Read configuration
+RETVAL=0
+path="$BASEDIR/bin/"
+prog="$BASEDIR/bin/agentctl.sh"
+dlog="$BASEDIR"
+desc="Glu Agent service"
+
+start() {
+  echo -n $"Starting $desc: "
+  ${prog} start >>$GLU_LOG 2>&1
+  RETVAL=$?
+  echo
+  [ $RETVAL -eq 0 ] && touch /var/lock/subsys/gluagent
+  return $RETVAL
+}
+
+stop() {
+  echo -n $"Shutting down $desc: "
+  $prog stop >>$GLU_LOG 2>&1
+  RETVAL=$?
+  echo
+  [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/gluagent
+  return $RETVAL
+}
+
+restart() {
+  stop
+  sleep 2
+  start
+}
+
+reload() {
+  echo -n $"Reloading $desc: "
+  killproc $prog -HUP
+  RETVAL=$?
+  echo
+  return $RETVAL
+}
+
+case "$1" in
+  start)
+  start
+  ;;
+  stop)
+  stop
+  ;;
+  restart)
+  restart
+  ;;
+  condrestart)
+  [ -e /var/lock/subsys/gluagent ] && restart
+  RETVAL=$?
+  ;;
+  reload)
+  reload
+  ;;
+  status)
+  $prog status
+  RETVAL=$?
+  ;;
+   *)
+  echo $"Usage: $0 {start|stop|restart|status}"
+  RETVAL=1
+esac
+
+exit $RETVAL

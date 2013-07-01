@@ -1,0 +1,81 @@
+#!/bin/bash
+#
+# Init file for Glu Console
+#
+# chkconfig: - 80 12
+# description: Start the Glu Console
+#
+# processname: glu
+# config:
+# config:
+
+source /etc/rc.d/init.d/functions
+GLU_VERSION=5.0.0
+GLU_LOG="/var/log/glu-console-jetty/org.linkedin.glu.console-server.out"
+BASEDIR="/opt/glu/console-server"
+### Default variables
+
+### Read configuration
+RETVAL=0
+prog="$BASEDIR/consolectl.sh"
+desc="Glu Console service"
+
+start() {
+  echo -n $"Starting $desc: "
+  ${prog} start >>$GLU_LOG 2>&1
+  RETVAL=$?
+  echo
+  [ $RETVAL -eq 0 ] && touch /var/lock/subsys/gluconsole
+  return $RETVAL
+}
+
+stop() {
+  echo -n $"Shutting down $desc: "
+  $prog stop >>$GLU_LOG 2>&1
+  RETVAL=$?
+  echo
+  [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/gluconsole
+  return $RETVAL
+}
+
+restart() {
+  stop
+  sleep 2
+  start
+}
+
+reload() {
+  echo -n $"Reloading $desc: "
+  killproc $prog -HUP
+  RETVAL=$?
+  echo
+  return $RETVAL
+}
+
+case "$1" in
+  start)
+  start
+  ;;
+  stop)
+  stop
+  ;;
+  restart)
+  restart
+  ;;
+  condrestart)
+  [ -e /var/lock/subsys/gluconsole ] && restart
+  RETVAL=$?
+  ;;
+  reload)
+  reload
+  ;;
+  status)
+  $prog status
+  RETVAL=$?
+  ;;
+   *)
+  echo $"Usage: $0 {start|stop|restart|status}"
+  RETVAL=1
+esac
+
+exit $RETVAL

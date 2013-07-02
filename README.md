@@ -11,6 +11,6 @@ An RPM spec file to build and install the Glu deployment automation platform.
 
 `wget https://raw.github.com/nmilford/rpm-glu/master/glu-agent -O ~/rpmbuild/SOURCES/glu-agent`
 
-`wget https://raw.github.com/nmilford/rpm-glu/master/glu-console -O ~/rpmbuild/SOURCES/glu-console`
+`wget https://raw.github.com/nmilford/rpm-glu/master/glu-console-jetty -O ~/rpmbuild/SOURCES/glu-console-jetty`
  
-`rpmbuild -bb ~/rpmbuild/SPECS/activemq.spec`
+`rpmbuild -bb ~/rpmbuild/SPECS/glu.spec`
